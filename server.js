@@ -2,12 +2,7 @@
 const express = require("express");
 const path = require("path");
 const fs = require('fs');
-const jsonNotes = fs.readFileSync('./db/db.json')
-const notes = JSON.parse(jsonNotes);
-console.log(notes);
-//const notes = require('./public/assets/js/index');
-
-
+const shortid = require('shortid');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -30,9 +25,10 @@ app.get('/api/notes', (req,res) =>{
 
 app.post('/api/notes', (req, res) => {
   const newNote = req.body;
+  req.body.id = shortid.generate();
   const jsonList = readJson();
   jsonList.push(newNote);
-  writeJson(JSON.stringify(jsonList,null,2));
+  writeJson(jsonList);
   
 });
 
@@ -41,6 +37,17 @@ app.listen(PORT, function() {
     console.log("App listening on PORT " + PORT);
   });
 
+app.delete("/api/notes/:id", function(req, res) {
+  const deleted = req.params.id;
+  let list = readJson()
+
+      const newList = list.filter(function(el){
+          return el.id != deleted;
+      })
+
+      writeJson(newList);
+});
+  
 
   function readJson() {
     const jsonList = fs.readFileSync(path.join(__dirname, '/db/db.json'))
@@ -49,9 +56,10 @@ app.listen(PORT, function() {
   }
 
   function writeJson(data){
-      fs.writeFile(path.join(__dirname, '/db/db.json'), data, complete);
+      fs.writeFile(path.join(__dirname, '/db/db.json'), JSON.stringify(data, null, 2), complete);
       function complete(err){
         if (err) throw err;
+        location.reload();
         console.log("Notes list has been updated!")
       }
         
