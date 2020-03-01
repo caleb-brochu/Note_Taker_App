@@ -59,7 +59,9 @@ app.delete("/api/notes/:id", function(req, res) {
       fs.writeFile(path.join(__dirname, '/db/db.json'), JSON.stringify(data, null, 2), complete);
       function complete(err){
         if (err) throw err;
-        location.reload();
+        app.get('/api/notes', (req,res) =>{
+          res.send(readJson());
+        });
         console.log("Notes list has been updated!")
       }
         
