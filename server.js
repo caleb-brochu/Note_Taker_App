@@ -28,7 +28,7 @@ app.post('/api/notes', (req, res) => {
   req.body.id = shortid.generate();
   const jsonList = readJson();
   jsonList.push(newNote);
-  writeJson(jsonList);
+  res.send(writeJson(jsonList));
   
 });
 
@@ -45,7 +45,7 @@ app.delete("/api/notes/:id", function(req, res) {
           return el.id != deleted;
       })
 
-      writeJson(newList);
+      res.send(writeJson(newList));
 });
   
 
@@ -59,9 +59,6 @@ app.delete("/api/notes/:id", function(req, res) {
       fs.writeFile(path.join(__dirname, '/db/db.json'), JSON.stringify(data, null, 2), complete);
       function complete(err){
         if (err) throw err;
-        app.get('/api/notes', (req,res) =>{
-          res.send(readJson());
-        });
         console.log("Notes list has been updated!")
       }
         
